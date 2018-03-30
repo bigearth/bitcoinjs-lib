@@ -17,7 +17,7 @@ describe('bitcoinjs-lib (addresses)', function () {
   })
 
   it('can generate an address from a SHA256 hash', function () {
-    var hash = bitcoin.crypto.sha256('correct horse battery staple')
+    var hash = bitcoin.crypto.sha256(Buffer.from('correct horse battery staple'))
     var d = bigi.fromBuffer(hash)
 
     var keyPair = new bitcoin.ECPair(d)
@@ -61,8 +61,8 @@ describe('bitcoinjs-lib (addresses)', function () {
     var keyPair = bitcoin.ECPair.fromWIF('Kxr9tQED9H44gCmp6HAdmemAzU3n84H3dGkuWTKvE23JgHMW8gct')
     var pubKey = keyPair.getPublicKeyBuffer()
 
-    var witnessScript = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey))
-    var scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(witnessScript))
+    var redeemScript = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey))
+    var scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript))
     var address = bitcoin.address.fromOutputScript(scriptPubKey)
 
     assert.strictEqual(address, '34AgLJhwXrvmkZS1o5TrcdeevMt22Nar53')
@@ -97,7 +97,7 @@ describe('bitcoinjs-lib (addresses)', function () {
     assert.strictEqual(address, '3P4mrxQfmExfhxqjLnR2Ah4WES5EB1KBrN')
   })
 
-  it('can support the retrieval of transactions for an address (3rd party blockchain)', function (done) {
+  it('can support the retrieval of transactions for an address (via 3PBP)', function (done) {
     var keyPair = bitcoin.ECPair.makeRandom()
     var address = keyPair.getAddress()
 

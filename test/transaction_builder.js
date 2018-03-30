@@ -308,24 +308,28 @@ describe('TransactionBuilder', function () {
     })
 
     fixtures.invalid.sign.forEach(function (f) {
-      it('throws on ' + f.exception + (f.description ? ' (' + f.description + ')' : ''), function () {
+      it('throws ' + f.exception + (f.description ? ' (' + f.description + ')' : ''), function () {
         var txb = construct(f, true)
 
         f.inputs.forEach(function (input, index) {
           input.signs.forEach(function (sign) {
             var keyPairNetwork = NETWORKS[sign.network || f.network]
             var keyPair2 = ECPair.fromWIF(sign.keyPair, keyPairNetwork)
-            var redeemScript
+            var redeemScript, witnessScript
 
             if (sign.redeemScript) {
               redeemScript = bscript.fromASM(sign.redeemScript)
             }
 
+            if (sign.witnessScript) {
+              witnessScript = bscript.fromASM(sign.witnessScript)
+            }
+
             if (!sign.throws) {
-              txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value)
+              txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value, witnessScript)
             } else {
               assert.throws(function () {
-                txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value)
+                txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value, witnessScript)
               }, new RegExp(f.exception))
             }
           })
@@ -362,7 +366,7 @@ describe('TransactionBuilder', function () {
 
         // if throws on incomplete too, enforce that
         if (f.incomplete) {
-          it('throws if ' + f.exception, function () {
+          it('throws ' + f.exception, function () {
             assert.throws(function () {
               var txb
               if (f.txHex) {
@@ -500,10 +504,10 @@ describe('TransactionBuilder', function () {
       '194a565cd6aa4cc38b8eaffa343402201c5b4b61d73fa38e49c1ee68cc0e6dfd2f5dae453dd86eb142e87a' +
       '0bafb1bc8401210283409659355b6d1cc3c32decd5d561abaac86c37a353b52895a5e6c196d6f44800000000'
       var txb = TransactionBuilder.fromTransaction(Transaction.fromHex(rawtx))
-      txb.inputs[0].value = 81530
-      txb.inputs[1].value = 81530
-      txb.inputs[2].value = 88920
-      txb.inputs[3].value = 88920
+      txb.inputs[0].value = 241530
+      txb.inputs[1].value = 241530
+      txb.inputs[2].value = 248920
+      txb.inputs[3].value = 248920
 
       assert.throws(function () {
         txb.build()
